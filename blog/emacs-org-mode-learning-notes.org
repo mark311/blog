@@ -1,0 +1,58 @@
+
+* Common
+
+- **C-c C-x \** 打开或关闭特殊符号显示
+
+- **M-x org-entities-help** 显示特殊符号的输入方法
+
+* Table & SpreatSheet
+
+** 创建表格
+
+#+BEGIN_EXAMPLE
+ID Name
+1 Mark
+2 Tom
+3 Jack
+#+END_EXAMPLE
+
+选中上述4行，然后执行：
+
+#+BEGIN_EXAMPLE
+C-c |
+#+END_EXAMPLE
+
+   
+  
+** 计算单列的总和
+
+| key                              |   count |
+|----------------------------------+---------|
+| admin\under{}task\under{}project | 1274512 |
+| sls\under{}log\under{}archive    |  642793 |
+| paytm\under{}dw                  | 1052712 |
+|----------------------------------+---------|
+| total                            | 2970017 |
+
+如果你想计算上面表格第二列三个数字的总和，公式写成
+这样是不行的：
+
+#+BEGIN_EXAMPLE
+#+TBLFM: @II+1$2=vsum(@I..@II)
+#+END_EXAMPLE
+
+上面公式会把'total'所在的单元格变成'admin\under{}task\under{}project +
+sls\under{}log\under{}archive + paytm\under{}dw'，这个可不是我们想要的。
+
+正确的做法有两种，一种是用绝对行号：
+
+#+BEGIN_EXAMPLE
+#+TBLFM: @5$2=vsum(@I..@II)
+#+END_EXAMPLE
+
+一种是用虚拟的第三个hline来辅助选定一个range，这个range中只有我们想要
+的那个单元格。具体公式为：
+
+#+BEGIN_EXAMPLE
+#+TBLFM: @II$2..@III$2=vsum(@I..@II)
+#+END_EXAMPLE

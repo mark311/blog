@@ -1,6 +1,9 @@
-最终一致性（Eventually Consistent）
-====
-
+---
+layout: post
+title:  "翻译：最终一致性（Eventually Consistent）"
+date:   2014-10-18 00:21:28
+categories: 分布式 最终一致性
+---
 一年前我写过关于一致性模型的[第一版文章](http://www.allthingsdistributed.com/2007/12/eventually_consistent.html)。因为当时写的很匆忙，所以我并不是很满意。时至今日这个topic已经非常重要了，值得更缜密的对待。ACM Queue请我重新修订它，并将发布在他们的杂志上。所以我有这个机会来改进这篇文章。这就是那份新的版本。
 
 最终一致性 - 在全球范围内建立可靠的分布式系统需要在一致性和可用性之间做权衡（trade-offs）。
@@ -11,7 +14,7 @@
 
 表现形式之一是所提供的数据一致性的类型，尤其是底层分布式系统提供一种数据冗余的最终一致性模型（One of the ways in which this manifests itself is in the type of data consistency that is provided, particularly when the underlying distributed system provides an eventual consistency model for data replication.）。在Amazon，我们设计这些大规模系统时使用一系列关于大规模数据冗余的指导原则和抽象方法，关注高可用性和数据一致性之间的平衡。在这篇文章里，我将介绍一些背景，它使得我们的方案能提供在全球范围内运行的可靠的分布式系统。早些发布在All Things Distributed网络博客上的[一篇文章](http://www.allthingsdistributed.com/2007/12/eventually_consistent.html)因为读者的帮助而得到了很大的改进。
 
-### 历史视角
+* 历史视角
 
 在理想世界里只有一种一致性模型：当更新发生时，所有观察者都能看到那个更新。这种模型第一次面临实现困难是发生在在70年代末的数据库系统中。在这个问题上最好的period piece是"Notes on Distributed Databases" by [Bruce Lindsay et al](http://acmqueue.com/modules.php?name=Content&pa=showpage&pid=233)[5]。 它奠定了数据库冗余的基础性原则，并讨论出来了一些达成数据一致性的技术方法。 许多这些技术方法尝试实现对分布式透明——也就是说，对于系统的用户来说，他们感觉仅有一个独立的系统，而不是多个相互协作的系统。在这个时期，许多系统更倾向于是整个系统失败，而不是打破这种透明[2]
 
@@ -24,37 +27,37 @@
 原则上，事务系统中的[ACID](http://en.wikipedia.org/wiki/ACID) properties (atomicity, consistency, isolation, durability)所定义的一致性属性是一种完全不同的一致性保证。在ACID中，一致性是保证当一个事务完成时，数据库处在一致的状态。例如，当资金在两个账户之间的转移前后，两个账户总的金额不能改变。在基于ACID的系统中，这种一致性通常是开发者的责任，开发者必须编写支持事务的程序。不过，通常数据库会提供管理完整性限制。
 
 
-### 一致性 —— 客户端和服务器
+* 一致性 —— 客户端和服务器
 
 对于一致性存在两种视角。一种来自开发者或客户端（developer/client）：他们如何观察数据的变更。另一种来自服务器端：（数据）更新如何在系统中流动，和怎么保证更新能被给出去（what guarantees systems can give with respect to updates）
 
-### 客户端一致性
+* 客户端一致性
 
 客户端有这些组成部分：
 
-* **一个存储系统.** 我们暂时把它当做一个黑匣子，但是必须假定底层的实现是一个大规模且高度分布的系统，用以保证持久性（durability）和可用性。
+- **一个存储系统.** 我们暂时把它当做一个黑匣子，但是必须假定底层的实现是一个大规模且高度分布的系统，用以保证持久性（durability）和可用性。
 
-* **进程A.** 这是一个读写存储系统的进程。
+- **进程A.** 这是一个读写存储系统的进程。
 
-* **进程B和C.** 这是两个独立于进程A的进程，它们也读写存储系统。他们是否是真实的进程或同一进程中的线程并不重要，重要的是他们是相互独立，且需要通信以共享信息。客户端一致性是关乎观察者（在这里指进程A, B或C）何时、以何种方式看到存储系统中数据对象的更新。在接下来的例子中会举例说明，进程A对数据对象产生更新后，不同种类的一致性。
+- **进程B和C.** 这是两个独立于进程A的进程，它们也读写存储系统。他们是否是真实的进程或同一进程中的线程并不重要，重要的是他们是相互独立，且需要通信以共享信息。客户端一致性是关乎观察者（在这里指进程A, B或C）何时、以何种方式看到存储系统中数据对象的更新。在接下来的例子中会举例说明，进程A对数据对象产生更新后，不同种类的一致性。
 
-* **强一致性（Strong consistency）.** 更新完成后，任何后续的访问都将返回更新后的值。
+- **强一致性（Strong consistency）.** 更新完成后，任何后续的访问都将返回更新后的值。
 
-* **弱一致性（Weak consistency）.** 系统不保证后续访问会返回更新后的值，只有当若干条件满足之后才能返回。从更新发生后到所有观察者确定总能取到更新后的值的这段时间，称为不一致窗口（inconsistent window）。
+- **弱一致性（Weak consistency）.** 系统不保证后续访问会返回更新后的值，只有当若干条件满足之后才能返回。从更新发生后到所有观察者确定总能取到更新后的值的这段时间，称为不一致窗口（inconsistent window）。
 
-* **最终一致性（Eventual consistency）.** 这是弱一致性的一个特殊形式。存储系统提供这样的保证：如果没有新的改变发生在数据对象上，最终所有的访问都将返回最后一次更新后的值。如果没有失败发生，不一致窗口的最大长度取决于通信延时、系统负载、冗余份数等因素。最流行的DNS（Domain Name System）系统就实现了最终一致性模型。根据一个配置模式（configured pattern）结合时间缓存控制，分布式地更新某个名字；最终所有client都会看到这个变更。
+- **最终一致性（Eventual consistency）.** 这是弱一致性的一个特殊形式。存储系统提供这样的保证：如果没有新的改变发生在数据对象上，最终所有的访问都将返回最后一次更新后的值。如果没有失败发生，不一致窗口的最大长度取决于通信延时、系统负载、冗余份数等因素。最流行的DNS（Domain Name System）系统就实现了最终一致性模型。根据一个配置模式（configured pattern）结合时间缓存控制，分布式地更新某个名字；最终所有client都会看到这个变更。
 
 最终一致性模型有若干变体值得注意：
 
-* **因果一致性（Causal consistency）.** 如果进程A已经把数据项被更新的消息告诉给了进程B，那么进程B后续的访问将返回更新后的结果，且新的写操作将确保替换掉先前的写操作结果。进程C与进程A之间并没有因果关系（估计作者是指没有进行更新消息的通信），那么进程C对数据的访问结果将取决于一般的最终一致性规则。
+- **因果一致性（Causal consistency）.** 如果进程A已经把数据项被更新的消息告诉给了进程B，那么进程B后续的访问将返回更新后的结果，且新的写操作将确保替换掉先前的写操作结果。进程C与进程A之间并没有因果关系（估计作者是指没有进行更新消息的通信），那么进程C对数据的访问结果将取决于一般的最终一致性规则。
 
-* **读你所写一致性（Read-your-writes consistency）.** 这是一种重要的模型。进程A更新一个数据项之后，再去访问它，总能得到更新后的值，并且不再会看到这个数据项更新之前的值。这是causal consistency模型的特殊形式。
+- **读你所写一致性（Read-your-writes consistency）.** 这是一种重要的模型。进程A更新一个数据项之后，再去访问它，总能得到更新后的值，并且不再会看到这个数据项更新之前的值。这是causal consistency模型的特殊形式。
 
-* **会话一致性（Session consistency）.** 这是前中模型的实用版本（practical version）。进程在一个会话上下文中访问存储系统，只要会话未结束，系统提供read-your-writes一致性保证。如果会话因某种失败而意外结束，一个新的会话需要创建，但是一致性保证不会在两个会话之间重叠（the guarantees do not overlap the sessions）
+- **会话一致性（Session consistency）.** 这是前中模型的实用版本（practical version）。进程在一个会话上下文中访问存储系统，只要会话未结束，系统提供read-your-writes一致性保证。如果会话因某种失败而意外结束，一个新的会话需要创建，但是一致性保证不会在两个会话之间重叠（the guarantees do not overlap the sessions）
 
-* **单调读一致性（Monotonic read consistency）.** 如果进程已经看到了数据对象特定的值（猜想不一定是最新的值），那么任何后续的访问将不会返回任何先前更新的值。
+- **单调读一致性（Monotonic read consistency）.** 如果进程已经看到了数据对象特定的值（猜想不一定是最新的值），那么任何后续的访问将不会返回任何先前更新的值。
 
-* **单调写一致性（Monotonic write consistency）.** 系统保证写操作由同一个进程执行。编写不提供这种一致性级别保证的系统是众所周知的困难（Systems that do not guarantee this level of consistency are notoriously hard to program）。
+- **单调写一致性（Monotonic write consistency）.** 系统保证写操作由同一个进程执行。编写不提供这种一致性级别保证的系统是众所周知的困难（Systems that do not guarantee this level of consistency are notoriously hard to program）。
 
 上述属性可被组合。例如，monotonic reads可以和session-leve consistency相结合。从实用的角度来看，这两种属性（monotonic reads和read-your-writes）是最终一致性系统最可取的属性，但不是任何场合必须的。它们使得开发者构建应用变得更简单，同时允许存储系统放宽对一致性的要求，并提供高可用性。
 
@@ -63,7 +66,7 @@
 最终一致性并不是极度（extreme）分布式系统中深奥难懂的属性。许多提供主备可靠性（primary-bakcup reliability）的现代RDBMSs同时实现同步和异步的冗余技术。在同步模式下，对冗余数据的同步更新也是事务（transaction）的一部分。在异步模式下，更新发生在被滞后的备份过程中，通常是通过log传递。如果主存储在log传递之前失败了，从晋级（promoted？）的备存储读数据将产生旧的、不一致的值。为了支持更具可伸缩的读取性能，RDBMSs已经开始提供从备存储上读数据的功能。这是一个提供最终一致性保证的经典案例，其中不一致窗口取决于周期性的log传递。
 
 
-### 服务器端一致性
+* 服务器端一致性
 
 在服务器端，我们需要仔细看看数据更新的消息是如何在系统中流动的，以便理解是什么驱动（drive?）了不同的模式，这些模式将影响开发者使用系统的体验。在进一步开始之前，我们先来建立一些定义：
 
@@ -91,12 +94,12 @@ Read-your-writes、session和monotonic一致性是否能被实现总体上取决
 
 在有些应用中，任何分区的不可用都是不可接受的，而且让到达分区的客户端有所进展是非常重要的。在那种情况下，每个分区都被分配一组新的节点以接受数据。当分区分割恢复后，合并操作会被执行。在亚马逊，购物车使用这种“write-always”的系统；分区出现时，允许顾客继续把物品放到购物车里面，即便是之前的购物车存储在其他分区。当分区恢复后，购物系统帮助存储系统合并各个分区的购物车。
 
-### 亚马逊的Dynamo
+* 亚马逊的Dynamo
 
 A system that has brought all of these properties under explicit control of the application architecture is [Amazon's Dynamo](http://www.allthingsdistributed.com/2007/10/amazons_dynamo.html), a key-value storage system that is used internally in many services that make up the Amazon e-commerce platform, as well as Amazon's Web Services. One of the design goals of Dynamo is to allow the application service owner who creates an instance of the Dynamo storage system—which commonly spans multiple data centers—to make the trade-offs between consistency, durability, availability, and performance at a certain cost point.3
 
 
-### 总结
+* 总结
 
 Data inconsistency in large-scale reliable distributed systems has to be tolerated for two reasons: improving read and write performance under highly concurrent conditions; and handling partition cases where a majority model would render part of the system unavailable even though the nodes are up and running.
 
