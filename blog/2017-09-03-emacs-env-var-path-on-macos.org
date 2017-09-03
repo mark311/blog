@@ -1,0 +1,33 @@
+最近遇到一个问题，我在MacOS上打开GUI版Emacs，无法执行gnuplot的命令，提
+示找不到gnuplot这个程序文件。
+
+首先我检查了gnuplot安装的目录，它位于/usr/local/bin下。通过执行emacs
+command `M-x getenv`，选"PATH" 得到的结果中，包含/usr/bin，但不包含
+/usr/local/bin这个目录。因此可以确定是这个原因导致emacs无法执行gnuplot
+命令的。解决可以从两个方面入手，一是在/usr/bin目录下建立gnuplot的软链，
+二是想办法配置GUI版Emacs的启动环境变量PATH。
+
+* 添加/usr/bin/的软链行不通
+
+不幸的是，我当前运行的MacOS版本（EI Capitan, 10.11.6），引入了一个新的
+功能叫做“Rootless”，它禁止用户修改包含Rootless属性的目录，即使是以
+root身份。查看Rootless属性的方法是在bash中执行'ls -l -@ /usr'。这使得
+第一个方法行不通。
+
+
+* 修改Emacs的环境变量
+
+试验证明，在我的MaxOS下，直接通过 `(setenv "PATH" ...)` 的方法[fn:1]是
+不能使得环境变量生效的，单独设置 `exec-path` 也不能最终使得问题得到解
+决。原因是在MacOS中，GUI程序的环境变量是通过
+~/.MacOSX/environment.plist 来决定的[fn:2]，这可能是唯一途径。
+
+关于如何修改environment.plist，这篇文章[fn:3]给出了详细的讲解。
+
+（未完待续）
+
+* Footnotes
+
+[fn:1] http://ergoemacs.org/emacs/emacs_env_var_paths.html
+[fn:2] https://stackoverflow.com/questions/3517165/pdflatex-command-not-working-in-emacs-terminal-mode
+[fn:3] https://www.emacswiki.org/emacs/EmacsApp
