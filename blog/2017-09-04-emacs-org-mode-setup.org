@@ -1,0 +1,171 @@
+
+
+* Emacs / Org mode 安装
+
+我使用的是Emacs 25.2.1的GUI版本，下载自[[https://emacsformacosx.com/][Emacs For Mac OS X]]。
+
+Emacs自带的Org mode版本是8.2.10，Org mode的官网是：http://orgmode.org
+
+Org mode 的一个优势在与它可以结合一些外部命令来完成更多任务，例如绘制
+图表、流程图等。为了执行这些命令，我们需要正确配置 binary 搜索路径，在
+Emacs 中，binary 搜索路径的配置不只是配置环境变量 PATH，还包括配置
+~exec-path~ 变量，在另外一篇文章[fn:5]中我有介绍配置方法。
+
+* Org mode里的中文字符
+
+** 表格里的中文字符对齐
+
+在我工作的Mac OS X系统下，Emacs GUI默认的中文字符并非正好英文字符的2倍
+宽度，因此当表格中包含中文字符的时候，表格并不能很好地对齐。
+
+| Name | Age | Job  |
+| 李三 |  41 | 厨师 |
+
+如果你现在是用Emacs在查看本文，并且你的字体存在上述问题，那么你看到的
+表格将会出现错位的现象。
+
+在网上搜索了很多资料，发现目前唯一的解决办法就是找到合适的字体，使得中
+文字符的宽度正好是英文字符宽度的2倍。幸运的是，这样的字体在我的Mac系统
+中是存在的 —— 黑体（SimHei），在Mac的“字体册”中，该字体被列为“固定
+宽度”类别。
+
+在init.el中插入下面的代码来设置默认字体为黑体。
+
+#+BEGIN_SRC emacs-lisp
+(custom-set-faces
+ '(default ((t (:inherit nil :stipple nil :background "Black" 
+                :foreground "White" :inverse-video nil :box nil
+                :strike-through nil :overline nil :underline nil 
+                :slant normal :weight normal :height 180 :width normal 
+                :foundry "nil" :family "SimHei")))))
+#+END_SRC
+
+** Export中文段落间有空格
+
+在Org mode中，快捷键 ~M-q~ 可将过长的行拆成固定等宽的多行，便于Org源码
+查看和编辑。在导出成HTML格式之后，多行的文本会被重新拼接成HTML的段落，
+段落之间会用一个空格隔开。对于英文段落来说这是合理的，因为两行之间除了
+换行符外，没有别的字符，如果直接去除换行符，那么两行之间紧邻的两个单词
+就会被错误地合并成一个单词。但对于中文段落来说，这确是一个小的瑕疵，一
+句话如果被拆成两行了，导出成HTML之后，原来换行符的位置会插入一个空格，
+这会影响最终导出的段落的美观度。
+
+网上有人提供了解决方法[fn:1][fn:2]，即在 ~init.el~ 中插入如下代码。
+
+#+BEGIN_SRC emacs-lisp
+(defadvice org-html-paragraph (before org-html-paragraph-advice
+                                      (paragraph contents info) activate)
+  "Join consecutive Chinese lines into a single long line without
+unwanted space when exporting org-mode to html."
+  (let* ((origin-contents (ad-get-arg 1))
+         (fix-regexp "[[:multibyte:]]")
+         (fixed-contents
+          (replace-regexp-in-string
+           (concat
+            "\\(" fix-regexp "\\) *\n *\\(" fix-regexp "\\)") "\\1\\2" origin-contents)))
+    (ad-set-arg 1 fixed-contents)))
+#+END_SRC
+
+上面这段代码的含义是，在 ~org-html-paragraph~ 函数导出某个html段落之前，
+将段落中前后字符是 ~:multibyte:~ 类别的换行符去除。
+
+* Org发布配置
+
+为了打造一键式的blog发布，我需要借助Org的发布管理功能[fn:3]，它将Org文
+档组织成多个projects。
+
+在Org帮助文档[fn:3]中给出的例子， ~:base-directory~ 和
+~:publishing-directory~ 采用不同的目录，这样能分离 *.org 文件和生成的
+*.html 文件。但是，对于执行 ~BEGIN_SRC~ 生成的文件，如 *.png 的图表文
+件，却难以随 *.html 文件一起转移，而是就地生成。为了使得所有生成的文件
+的路径统一，我更倾向于把这两个目录配置成相同的目录。
+
+发布执行方法如下：
+
+- ~M-x org-publish-all~ :: 发布所有 projects
+- ~M-x org-publish-current-project~ :: 发布当前 project
+
+* 代码语法高亮
+
+http://orgmode.org/worg/org-contrib/babel/examples/fontify-src-code-blocks.html
+
+
+* 图表生成
+
+** GnuPlot vs R
+
+在Org的帮助文档中，介绍了Org Plot的用法[fn:4]，它默认是使用 GnuPlot 来
+绘制图表。具体的，你可以根据一个 table 中的数据来绘制一张图表。
+
+这个方法有个问题，它阻碍了“一键式”发布，每个图表都要手动地
+执行命令来生成图像文件。除了 Org / GnuPlot 外，我们还可以选择另外一种
+方式来绘制图表，那就是执行 R 的内嵌脚本。事实上，我们可以执行除了 R 之
+外的任何脚本，包括 gnuplot 的脚本，不过 R 语言比 GnuPlot 有更好的发展
+前景，因此我选择 R 的内嵌脚本来绘制图表。
+
+** Mac OS X 下安装 R 及 ggplot2
+
+*ggplot2* [fn:6] 是 R 的一个软件包，它提供了强大的绘图功能。为了使用它，
+我们首先需要安装 R。在 Mac OS X 上面，我使用 homebrew 来安装 R：
+
+#+BEGIN_EXAMPLE
+$ brew install r
+#+END_EXAMPLE
+
+安装 R 需要一段时间，安装完成之后，我们进入 R 的命令提示符，执行如下命
+令安装 ggplot2：
+
+#+BEGIN_EXAMPLE
+$ r
+> install.packages("ggplot2")
+#+END_EXAMPLE
+
+安装自动进行，完成之后，检查安装是否成功：
+
+#+BEGIN_EXAMPLE
+> library(ggplot2)
+#+END_EXAMPLE
+
+** 示例
+
+下面是一个用 R 绘图的示例，数据和代码来自于此[fn:7]（提示：该节内容结合 Org 源码和 html 文件查看）
+
+#+TBLNAME: delsee
+| airmass | zenith_seeing | delivered_seeing |
+|---------+---------------+------------------|
+|     1.3 |          0.95 |        1.1119612 |
+|     1.3 |           1.0 |        1.1704854 |
+|     1.3 |           1.1 |        1.2875340 |
+|     1.3 |           1.2 |        1.4045825 |
+#+TBLFM: $3=$2*($1**0.6)
+
+下面这是绘图脚本，根据上面表格的内容绘制图表。
+
+#+BEGIN_SRC R :exports both :results output graphics :var delsee=delsee :file delsee-r.png :width 400 :height 300
+library(ggplot2)
+p <- ggplot(delsee, aes(zenith_seeing, delivered_seeing))
+p <- p + geom_point()
+p
+#+END_SRC
+
+#+RESULTS:
+
+
+* Footnotes
+
+[fn:1] 去除 org-mode 輸出 HTML 時產生多餘的空格: https://coldnew.github.io/a1ed40e3/
+
+[fn:2] org-mode and Worg: http://wiki.dreamrunner.org/public_html/Emacs/org-mode.html
+
+[fn:3] Org mode: 14 Publishing: http://orgmode.org/org.html#Publishing
+
+[fn:4] Org mode: 3.6 Org-Plot: http://orgmode.org/org.html#Org_002dPlot
+
+[fn:5] Emacs 中 binary 搜索路径配置: file:2017-09-03-emacs-env-var-path-on-macos.html
+
+[fn:6] Graphics with ggplot2: http://www.statmethods.net/advgraphs/ggplot2.html
+
+[fn:7] Emacs org-mode examples and cookbook：http://ehneilsen.net/notebook/orgExamples/org-examples.html#sec-11
+
+
+
