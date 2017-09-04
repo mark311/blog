@@ -17,17 +17,16 @@ root身份。查看Rootless属性的方法是在bash中执行'ls -l -@ /usr'。�
 
 * 修改Emacs的环境变量
 
-试验证明，在我的MaxOS下，直接通过 `(setenv "PATH" ...)` 的方法[fn:1]是
-不能使得环境变量生效的，单独设置 `exec-path` 也不能最终使得问题得到解
-决。原因是在MacOS中，GUI程序的环境变量是通过
-~/.MacOSX/environment.plist 来决定的[fn:2]，这可能是唯一途径。
+可以在Emacs内部改变环境变量，方法[fn:1]是通过 `(setenv "PATH" ...)` 的
+方法使得环境变量生效，但这只会改变环境变量的值，只在通过bash启动子进程
+的场景下有用，还有一些场景是Emacs绕过bash自己去找寻binary，这种情况下
+需要设置 `exec-path` 这个变量。
 
-关于如何修改environment.plist，这篇文章[fn:3]给出了详细的讲解。
-
-（未完待续）
+#+BEGIN_SRC emacs-lisp
+(setenv "PATH" (concat "/usr/local/bin" ":" (getenv "PATH")))
+(setq exec-path (append (list "/usr/local/bin") exec-path))
+#+END_SRC
 
 * Footnotes
 
 [fn:1] http://ergoemacs.org/emacs/emacs_env_var_paths.html
-[fn:2] https://stackoverflow.com/questions/3517165/pdflatex-command-not-working-in-emacs-terminal-mode
-[fn:3] https://www.emacswiki.org/emacs/EmacsApp
