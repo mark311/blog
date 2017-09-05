@@ -156,6 +156,48 @@ p
 #+RESULTS:
 
 
+* Ditta 框图
+
+下面这个图是 ditaa 自动生成的，ditaa 这个语言[fn:10]的支持是 Org mode 原生支
+持的。
+
+#+BEGIN_SRC ditaa :exports both :file ditaa-seqboxes.png
++------+   +-----+   +-----+   +-----+
+|{io}  |   |{d}  |   |{s}  |   |cBLU |
+| Foo  +---+ Bar +---+ Baz +---+ Moo |
+|      |   |     |   |     |   |     |
++------+   +-----+   +--+--+   +-----+
+                        |
+           /-----\      |      +------+
+           |     |      |      | c1AB |
+           | Goo +------+---=--+ Shoo |
+           \-----/             |      |
+                               +------+
+#+END_SRC
+
+#+RESULTS:
+[[file:ditaa-seqboxes.png]]
+
+但是它的执行依赖 ~ditta.jar~ 库，这个库是需要自己从网上下载
+的[fn:9]，目前我下载到的版本是 ~ditaa0_9.jar~ ，其实这个软件已经有很长时
+间没有更新了。
+
+下载后我把这个 ~ditaa0_9.jar~ 的文件直接提交到了我的 emacs conf 代码库，
+路径如下：
+
+#+BEGIN_EXAMPLE
+~/.emacs.d/java/ditaa0_9.jar
+#+END_EXAMPLE
+
+然后，重新配置下面这个变量的值，使得 ~ob-ditaa~ 能找到 ~ditta0_9.jar~ 这
+个库文件。
+
+#+BEGIN_SRC emacs-lisp
+(setq org-ditaa-jar-path "~/.emacs.d/java/ditaa0_9.jar")
+#+END_SRC
+
+/延伸/ ：[[https://archives.haskell.org/projects.haskell.org/diagrams/doc/quickstart.html][Digrams]] 是Heskell语言实现的一个用于生成通用矢量图形的工具，非常强大。
+
 * Footnotes
 
 [fn:1] 去除 org-mode 輸出 HTML 時產生多餘的空格: https://coldnew.github.io/a1ed40e3/
@@ -173,6 +215,10 @@ p
 [fn:7] Emacs org-mode examples and cookbook：http://ehneilsen.net/notebook/orgExamples/org-examples.html#sec-11
 
 [fn:8] Org mode; 14.7 Languages: http://orgmode.org/org.html#Languages
+
+[fn:9] Ditaa download page: http://ditaa.sourceforge.net/#download
+
+[fn:10] Ditaa usage: http://ditaa.sourceforge.net/#usage
 
 
 
