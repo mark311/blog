@@ -196,7 +196,11 @@ p
 (setq org-ditaa-jar-path "~/.emacs.d/java/ditaa0_9.jar")
 #+END_SRC
 
-/延伸/ ：[[https://archives.haskell.org/projects.haskell.org/diagrams/doc/quickstart.html][Digrams]] 是Heskell语言实现的一个用于生成通用矢量图形的工具，非常强大。
+* Temp
+
+[[https://archives.haskell.org/projects.haskell.org/diagrams/doc/quickstart.html][Digrams]] 是Heskell语言实现的一个用于生成通用矢量图形的工具，非常强大。
+
+这里：http://doc.norang.ca/org-mode.html#playingwithditaa  也有很多示例。
 
 * Footnotes
 
