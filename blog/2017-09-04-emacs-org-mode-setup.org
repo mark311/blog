@@ -6,10 +6,15 @@
 
 Emacs自带的Org mode版本是8.2.10，Org mode的官网是：http://orgmode.org
 
+** 外部命令
+
 Org mode 的一个优势在与它可以结合一些外部命令来完成更多任务，例如绘制
 图表、流程图等。为了执行这些命令，我们需要正确配置 binary 搜索路径，在
 Emacs 中，binary 搜索路径的配置不只是配置环境变量 PATH，还包括配置
 ~exec-path~ 变量，在另外一篇文章[fn:5]中我有介绍配置方法。
+
+虽然 Org mode 支持多种外部命令，但是默认只能允许 emacs-lisp 被执
+行，其他语言需要配置之后才能执行[fn:8]。
 
 * Org mode里的中文字符
 
@@ -166,6 +171,8 @@ p
 [fn:6] Graphics with ggplot2: http://www.statmethods.net/advgraphs/ggplot2.html
 
 [fn:7] Emacs org-mode examples and cookbook：http://ehneilsen.net/notebook/orgExamples/org-examples.html#sec-11
+
+[fn:8] Org mode; 14.7 Languages: http://orgmode.org/org.html#Languages
 
 
 
