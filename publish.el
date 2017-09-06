@@ -38,7 +38,8 @@
                   ':publishing-function 'org-html-publish-to-html
                   ':headline-levels 3
                   ':section-numbers nil
-                  ':with-toc nil)))
+                  ':with-toc nil
+                  ':html-head "<link rel=\"stylesheet\" href=\"../css/default.css\" type=\"text/css\" />")))
 
 (org-publish-all)
 

@@ -3,3 +3,4 @@
 - file:2014-10-12-emacs-lisp-basic.html
 - file:2014-10-18-eventually-consistent.html
 - file:2014-11-15-multi-fuzzy-pattern-matching.html
+- file:2017-09-04-emacs-org-mode-setup.org

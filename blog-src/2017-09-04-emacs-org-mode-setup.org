@@ -1,4 +1,6 @@
-
+#+TITLE:     Emacs Org Mode Setup
+#+AUTHOR:    Mark Tang
+#+EMAIL:     markta31@gmail.com
 
 * Emacs / Org mode 安装
 
