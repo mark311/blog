@@ -196,6 +196,117 @@ p
 (setq org-ditaa-jar-path "~/.emacs.d/java/ditaa0_9.jar")
 #+END_SRC
 
+
+* GraphViz
+
+[[http://www.graphviz.org/][GraphViz]] 就不用介绍了，大名赫赫。
+
+** 安装
+
+在 Mac OS X 上面，我使用 homebrew 来安装：
+
+#+BEGIN_EXAMPLE
+$ brew install graphviz
+#+END_EXAMPLE
+
+安装完成之后， ~dot~ 这个命令就能在 shell 中执行了。 ~dot~ 默认会安装
+在 /usr/local/bin 目录下，确保 search path 正确。
+
+** 示例
+
+#+BEGIN_SRC dot :exports both :file dot-example.png :cmdline -Kdot -Tpng
+digraph G {
+  size="8,6"
+  ratio=expand
+  edge [dir=both]
+  plcnet [shape=box, label="PLC Network"]
+  subgraph cluster_wrapline {
+    label="Wrapline Control System"
+    color=purple
+    subgraph {
+    rank=same
+    exec
+    sharedmem [style=filled, fillcolor=lightgrey, shape=box]
+    }
+    edge[style=dotted, dir=none]
+    exec -> opserver
+    exec -> db
+    plc -> exec
+    edge [style=line, dir=both]
+    exec -> sharedmem
+    sharedmem -> db
+    plc -> sharedmem
+    sharedmem -> opserver
+  }
+  plcnet -> plc [constraint=false]
+  millwide [shape=box, label="Millwide System"]
+  db -> millwide
+
+  subgraph cluster_opclients {
+    color=blue
+    label="Operator Clients"
+    rankdir=LR
+    labelloc=b
+    node[label=client]
+    opserver -> client1
+    opserver -> client2
+    opserver -> client3
+  }
+}
+#+END_SRC
+
+#+RESULTS:
+[[file:dot-example.png]]
+
+
+* PlantUML
+
+[[http://plantuml.com/][PlantUML]] 是一个开源项目，通过编写 plantuml 的脚本，支持快速绘制各种
+UML 图。
+
+** 安装
+
+在 Mac OS X 上面，我使用 homebrew 来安装：
+
+#+BEGIN_EXAMPLE
+$ brew install plantuml
+#+END_EXAMPLE
+
+安装完成之后， ~plantuml~ 这个命令就能在 shell 中执行了。
+
+但是 ~ob-plantuml~ 这个 org babel 插件并不调用 plantuml 的可执行文件，
+而是根据 ~org-plantuml-jar-path~ 所指向的 plantuml.jar ，调用 'java
+-jar' 命令。因此，我们需要在 ~init.el~ 中配置这个变量。
+
+在我的 Mac 上，我是这样配置的：
+
+#+BEGIN_SRC emacs-lisp
+(setq org-plantuml-jar-path "/usr/local/Cellar/plantuml/1.2017.14/libexec/plantuml.jar")
+#+END_SRC
+
+
+** 示例
+
+#+BEGIN_SRC plantuml :exports both :file plantuml-exmaple.png
+title Example Sequence Diagram
+activate Client
+Client -> Server: Session Initiation
+note right: Client requests new session
+activate Server
+Client <-- Server: Authorization Request
+note left: Server requires authentication
+Client -> Server: Authorization Response
+note right: Client provides authentication details
+Server --> Client: Session Token
+note left: Session established
+deactivate Server
+Client -> Client: Saves token
+deactivate Client
+#+END_SRC
+
+#+RESULTS:
+[[file:plantuml-exmaple.png]]
+
 * Temp
 
 [[https://archives.haskell.org/projects.haskell.org/diagrams/doc/quickstart.html][Digrams]] 是Heskell语言实现的一个用于生成通用矢量图形的工具，非常强大。
