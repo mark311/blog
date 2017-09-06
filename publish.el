@@ -28,7 +28,7 @@
 
 ;; About Org project definition
 (setq my-blog-project-root ".")
-(setq my-blog-blog-source-dir (concat my-blog-project-root "/" "blog-gen"))
+(setq my-blog-blog-source-dir (concat my-blog-project-root "/" "blog"))
 
 (setq org-publish-project-alist
       (list (list "blog"

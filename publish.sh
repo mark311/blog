@@ -1,11 +1,11 @@
 #!/bin/sh
 cd $(dirname $(pwd)/$0)
 
-if [ ! -d blog-gen ]; then
-    mkdir blog-gen
+if [ ! -d blog ]; then
+    mkdir blog
 fi
-cp -p blog/*.org blog-gen/
+cp -p blog-src/*.org blog/
 
 emacs --batch --script publish.el
 
-rm -f blog-gen/*.org
+rm -f blog/*.org
