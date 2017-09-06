@@ -13,4 +13,5 @@ cp -p draft-blog.src/*.org draft-blog/
 
 emacs --batch --script publish.el
 
-rm -f blog/*.org
+rm -f {draft-blog,blog}/*.org
+rm -f {draft-blog,blog}/*~

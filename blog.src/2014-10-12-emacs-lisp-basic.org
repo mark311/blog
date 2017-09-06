@@ -1,6 +1,6 @@
-#+TITLE: 学习Emacs Lisp - 基础篇
+#+TITLE: 学习 Emacs Lisp - 基础篇
 #+AUTHOR: Mark Tang
-#+DATE: 2014-10-12 00:19:54
+#+DATE: 2014-10-12
 
 * 一切都是List
 

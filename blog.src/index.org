@@ -1,6 +1,37 @@
 #+TITLE: Index
 
-- file:2014-10-12-emacs-lisp-basic.html
-- file:2014-10-18-eventually-consistent.html
-- file:2014-11-15-multi-fuzzy-pattern-matching.html
-- file:2017-09-04-emacs-org-mode-setup.org
+* Index
+
+#+BEGIN_SRC python :exports results :results output raw
+import os
+import itertools as it
+
+orgfiles = [f for f in os.listdir('.') if f.endswith(".org") and not f.startswith(".#")]
+orgfiles.remove("index.org")
+orgfiles.sort(reverse=True)
+
+htmlfiles = [ f[:-len(".org")]+".html" for f in orgfiles]
+
+def get_title(file):
+    titleline = next(
+        it.ifilter(lambda l: l.startswith("#+TITLE:"),
+                   it.islice(open(file, 'r').xreadlines(), 0, 5)))
+    return titleline.partition(":")[2].strip()
+
+def get_date(file):
+    titleline = next(
+        it.ifilter(lambda l: l.startswith("#+DATE:"),
+                   it.islice(open(file, 'r').xreadlines(), 0, 5)))
+    return titleline.partition(":")[2].strip()
+
+def format_article(date, title, htmlfile):
+    return "- %s %s file:%s" % (date, title, htmlfile)
+
+xlines = it.imap(format_article,
+                     it.imap(get_date, orgfiles),
+                     it.imap(get_title, orgfiles),
+                     htmlfiles)
+print "\n".join(xlines)
+#+END_SRC
+
+#+RESULTS:
