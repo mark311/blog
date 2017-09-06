@@ -57,7 +57,8 @@
         ':section-numbers nil
         ':with-toc nil
         ':html-head "<link rel=\"stylesheet\" href=\"../css/default.css\" type=\"text/css\" />"
-        ':html-postamble t))
+        ':html-postamble t
+        ':html-link-home "/blog/index.html"))
 
 (setq org-publish-project-alist
       (list (my-blog-make-blog-project "blog" "./blog")
