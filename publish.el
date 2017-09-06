@@ -1,8 +1,34 @@
-;; Usage: execute `M-x eval-buffer' the first time you open Emacs,
-;; later you can execute `M-x org-publish-all' anywhere to re-publish.
+(require 'package)
+(package-initialize)
+(add-to-list 'load-path "~/.emacs.d/lisp")
 
-(setq my-blog-project-root (file-name-directory (buffer-file-name)))
-(setq my-blog-blog-source-dir (concat my-blog-project-root "/" "blog"))
+(require 'my-org-fixup)
+(require 'my-utils)
+
+;; External command / jar paths
+(my-utils-append-exec-path "/usr/local/bin/")
+(setq org-ditaa-jar-path "~/.emacs.d/java/ditaa0_9.jar")
+(setq org-plantuml-jar-path "~/.emacs.d/java/plantuml.jar")
+
+;; Set Org mode executable languages
+;; see http://orgmode.org/org.html#Languages
+(org-babel-do-load-languages
+ 'org-babel-load-languages
+ '((emacs-lisp . t)
+   (python . t)
+   (gnuplot . t)
+   (ditaa . t)
+   (plantuml . t)
+   (sh . t)
+   (dot . t)
+   (R . t)))
+
+;; Disable babel comfirm
+(setq org-confirm-babel-evaluate nil)
+
+;; About Org project definition
+(setq my-blog-project-root ".")
+(setq my-blog-blog-source-dir (concat my-blog-project-root "/" "blog-gen"))
 
 (setq org-publish-project-alist
       (list (list "blog"
@@ -15,3 +41,5 @@
                   ':with-toc nil)))
 
 (org-publish-all)
+
+(message "all done")
