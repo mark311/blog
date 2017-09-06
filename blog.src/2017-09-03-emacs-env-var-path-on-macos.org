@@ -1,3 +1,7 @@
+#+TITLE:     Setting Environment Variable for Emacs
+#+AUTHOR:    Mark Tang
+#+DATE:      2017-09-03
+
 最近遇到一个问题，我在MacOS上打开GUI版Emacs，无法执行gnuplot的命令，提
 示找不到gnuplot这个程序文件。
 

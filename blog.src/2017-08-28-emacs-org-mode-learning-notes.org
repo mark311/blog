@@ -1,3 +1,10 @@
+#+TITLE:     Emacs Org-mode 使用技巧
+#+AUTHOR:    Mark Tang
+#+DATE:      2017-08-28
+
+本文搜集整理 Emacs Org-mode 各种有用的技巧。
+
+（ /持续整理中，未完待续/ ）
 
 * Common
 
@@ -56,3 +63,17 @@ sls\under{}log\under{}archive + paytm\under{}dw'，这个可不是我们想要�
 #+BEGIN_EXAMPLE
 #+TBLFM: @II$2..@III$2=vsum(@I..@II)
 #+END_EXAMPLE
+
+
+** 拷贝和粘贴
+
+如何拷贝一个单元格里面的内容？如果是要拷贝粘贴到表格之外的地方，那么只
+能用传统的选择复制方法，只是这种方式效率会低一点。如果是拷贝到表格的其
+他地方，那么使用下面几个命令会比较高效。
+
+- ~C-c C-x C-w~ :: 剪切单元格的内容
+- ~C-c C-x M-w~ :: 复制单元格的内容
+- ~C-c C-x C-y~ :: 粘贴到单元格
+
+上述命令还可以对连续的多个单元格整体操作，方法是选中一个矩形区域的单元
+格，然后执行上述命令。

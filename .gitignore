@@ -1,5 +1,4 @@
 *~
 .DS_Store
-blog/*.html
-blog/*.png
-out/
+blog/
+draft-blog/

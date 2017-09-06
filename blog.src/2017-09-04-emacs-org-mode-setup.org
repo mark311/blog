@@ -1,6 +1,6 @@
 #+TITLE:     Emacs Org Mode Setup
 #+AUTHOR:    Mark Tang
-#+EMAIL:     markta31@gmail.com
+#+DATE:      2017-09-04
 
 * Emacs / Org mode 安装
 
@@ -309,11 +309,16 @@ deactivate Client
 #+RESULTS:
 [[file:plantuml-exmaple.png]]
 
-* Temp
+* Others
+
+几个比较完整介绍 Emacs Org-mode 的博客：
+
+- Norang: http://doc.norang.ca/org-mode.html
+- Dennis Ogbe 的Blog: https://ogbe.net/blog/blogging_with_org.html
+- Emacs org-mode examples and cookbook: http://ehneilsen.net/notebook/orgExamples/org-examples.html
 
 [[https://archives.haskell.org/projects.haskell.org/diagrams/doc/quickstart.html][Digrams]] 是Heskell语言实现的一个用于生成通用矢量图形的工具，非常强大。
 
-这里：http://doc.norang.ca/org-mode.html#playingwithditaa  也有很多示例。
 
 * Footnotes
 

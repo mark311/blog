@@ -1,9 +1,7 @@
----
-layout: post
-title:  "翻译：最终一致性（Eventually Consistent）"
-date:   2014-10-18 00:21:28
-categories: 分布式 最终一致性
----
+#+TITLE:     翻译：最终一致性（Eventually Consistent）
+#+AUTHOR:    Mark Tang
+#+DATE:      2014-10-18
+
 一年前我写过关于一致性模型的[第一版文章](http://www.allthingsdistributed.com/2007/12/eventually_consistent.html)。因为当时写的很匆忙，所以我并不是很满意。时至今日这个topic已经非常重要了，值得更缜密的对待。ACM Queue请我重新修订它，并将发布在他们的杂志上。所以我有这个机会来改进这篇文章。这就是那份新的版本。
 
 最终一致性 - 在全球范围内建立可靠的分布式系统需要在一致性和可用性之间做权衡（trade-offs）。
