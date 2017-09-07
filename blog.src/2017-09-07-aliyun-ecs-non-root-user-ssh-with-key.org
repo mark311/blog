@@ -1,0 +1,72 @@
+#+TITLE: 阿里云 ECS 普通用户免密登录
+#+AUTHOR: Mark Tang
+#+DATE: 2017-09-07
+
+最近购买了一台阿里云ECS主机，我在购买时没有选配默认的公网IP，而是之后
+绑定了一个弹性公网IP，“安全设置”栏我选择的是“设置秘钥”，创建了一个
+新的秘钥对绑定在这台ECS上。
+
+* 登录失败
+
+一切就绪之后，我按照网上 [[https://help.aliyun.com/document_detail/51798.html][使用 SSH 密钥对连接 Linux 实例]] 的方法，以root
+用户身份成功地连接到了ECS。
+
+#+BEGIN_EXAMPLE
+$ ssh -i ~/my-ssh-private-key/my-default-key.pem root@MY_ECS_PUB_IP
+#+END_EXAMPLE
+
+众所周知，出于安全性安全性，root 用户一般不作为日常登录的用户，为此我
+创建了一个新的用户 —— admin，我没有配置密码，因为我希望用 publickey 的
+方式免密登录（这也是更安全的做法）。
+
+当我以登录root同样的方法登录admin用户时，我得到了ssh登录失败的消息：
+
+#+BEGIN_EXAMPLE
+$ ssh -i ~/my-ssh-private-key/my-default-key.pem admin@MY_ECS_PUB_IP
+Permission denied (publickey).
+#+END_EXAMPLE
+
+我当时认为阿里云ECS可能是对root用户做了特殊处理，于是打算用上传
+idrsa.pub文件的方式[fn:1]来实现免密登录。将我笔记本上的idrsa.pub文件上
+传到admin用户的.ssh目录之后，登录还是失败，我以为.ssh目录下文件的权限
+没有配置正确，经过一番检查后，确认.ssh下的配置是都是正确的。
+
+#+BEGIN_EXAMPLE
+$ ssh admin@MY_ECS_PUB_IP
+Permission denied (publickey).
+#+END_EXAMPLE
+
+* 正确的登录姿势
+
+怀着好奇与不解，我查看了root的.ssh目录下面的文件，发现只有一个
+authorized\under{}keys。其配置的仅有一项，如下：
+
+#+BEGIN_EXAMPLE
+ssh-rsa XXXXXX...XXXXXX user@houyi
+#+END_EXAMPLE
+
+我想这个与我的ECS秘钥对大概没有直接关系，但是应该是root之所以能登录成
+功的关键因素。把这个文件拷贝到/home/admin/.ssh目录下，然后重新以私钥方
+式登录admin用户，就奇迹般地成功了！
+
+所以，如果要远程登录普通用户，需要把/root/.ssh/authorized\under{}keys
+中的user@houyi的这行拷贝到普通用户的authorized\under{}keys中去，然后用
+私钥登录。
+
+我猜测，当我从笔记本连接公网IP的时候，我连接的并不是我的ECS本身，而是
+中间的某个代理，我的ECS上的用户如果信任这个代理（user@houyi这个公钥），
+那么就可以借助它实现从公网的远程登录。
+
+#+BEGIN_SRC ditaa :exports results :file 2017-09-07-ecs-ssh-from-external.png
++-----------+          +-----------+         +--------+
+|cBLU       |          |cYEL       |         |cGRE    |
+| My Laptop +-=--------+ SSH Proxy +---=-----+ My ECS |
+|           |          |           |         |        |
++-----------+          +-----------+         +--------+
+#+END_SRC
+
+
+* Footnotes
+
+[fn:1] SSH Public Key Login: https://www.digitalocean.com/community/questions/setting-up-ubuntu?answer=34263
+
